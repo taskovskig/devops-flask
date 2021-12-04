@@ -50,6 +50,7 @@ jobs:
           ./terraform init
 
       - name: Terraform plan
+        shell: bash
         id: terraform-plan
         run: ./terraform plan --no-color
       
