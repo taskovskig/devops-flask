@@ -55,7 +55,7 @@ jobs:
         id: terraform-plan
         shell: bash
         working-directory: ${{ env.working-directory }}
-        run: ./terraform plan --no-color
+        run: ./terraform plan -no-color
       
       - name: Workflow end
         run: echo "Finished with terraform actions"
