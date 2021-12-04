@@ -46,6 +46,7 @@ jobs:
           unzip terraform.zip
           chmod +x ./terraform
           ./terraform version
+          mv terraform infra/
           cd infra
           ./terraform init
 
