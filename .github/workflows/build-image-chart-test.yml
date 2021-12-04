@@ -91,8 +91,7 @@ jobs:
     name: Build helm chart
     runs-on: ubuntu-latest
     env:
-      working-directory: ./helm
-      app-name: flask-app
+      working-directory: ./helm/flask-app
 
     steps:
       - uses: actions/checkout@v2
@@ -117,17 +116,15 @@ jobs:
           ECR_REPOSITORY: flask-app
           IMAGE_TAG: v1.0.${{ github.run_number }}
           APP_VERSION: 1.0.${{ github.run_number }}
-          APP_NAME: ${{ env.app-name }}
         run: |
           export HELM_EXPERIMENTAL_OCI=1
           curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
           chmod 700 get_helm.sh
           ./get_helm.sh
           rm -f get_helm.sh
-          sed -ie "s/GH_RUN_NUMBER/${APP_VERSION}/g" ${APP_NAME}/Chart.yaml
-          sed -ie "s/IMAGE_REGISTRY/${ECR_REGISTRY}/g" ${APP_NAME}/values.yaml
-          sed -ie "s/IMAGE_REPOSITORY/${ECR_REPOSITORY}/g" ${APP_NAME}/values.yaml
-          sed -ie "s/IMAGE_TAG/${IMAGE_TAG}/g" ${APP_NAME}/values.yaml
-          helm dependency update
-          helm package ${APP_NAME}
-          helm push ${APP_NAME}-1.0.${APP_VERSION}.tgz oci://${ECR_REGISTRY}/
+          sed -ie "s/GH_RUN_NUMBER/${APP_VERSION}/g" Chart.yaml
+          sed -ie "s/IMAGE_REGISTRY/${ECR_REGISTRY}/g" values.yaml
+          sed -ie "s/IMAGE_REPOSITORY/${ECR_REPOSITORY}/g" values.yaml
+          sed -ie "s/IMAGE_TAG/${IMAGE_TAG}/g" values.yaml
+          helm package ./
+          helm push flask-app-1.0.${APP_VERSION}.tgz oci://${ECR_REGISTRY}/
