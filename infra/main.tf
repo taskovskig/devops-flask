@@ -14,7 +14,7 @@ terraform {
 
 terraform {
   backend "s3" {
-    bucket         = "tf-stt"
+    bucket         = "tf-rmt-stt-fls"
     key            = "devops-flask/flask-app/terraform.tfstate"
     region         = "eu-central-1"
     dynamodb_table = "terraform-state-lock"
