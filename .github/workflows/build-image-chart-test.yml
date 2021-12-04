@@ -17,6 +17,8 @@ jobs:
     timeout-minutes: 10
     name: Create ECR repository
     runs-on: ubuntu-latest
+    env:
+      working-directory: ./infra
 
     steps:
       - uses: actions/checkout@v2
@@ -40,8 +42,8 @@ jobs:
       
       - name: Terraform install and init
         shell: bash
+        working-directory: ${{ env.working-directory }}
         run: |
-          cd infra
           export TF_VERSION=$(head -1 .terraform-version)
           curl -qL -o terraform.zip https://releases.hashicorp.com/terraform/${TF_VERSION}/terraform_${TF_VERSION}_linux_amd64.zip
           unzip terraform.zip
