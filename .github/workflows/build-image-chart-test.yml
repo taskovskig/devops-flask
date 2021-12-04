@@ -40,7 +40,7 @@ jobs:
       - name: Set environment variable TF_VERSION
         run: echo "TF_VERSION=$(head -1 infra/.terraform-version)" >> $GITHUB_ENV
       
-      - name: Terraforming install and init
+      - name: Terraform install and init
         run: |
           curl -qL -o terraform.zip https://releases.hashicorp.com/terraform/${TF_VERSION}/terraform_${TF_VERSION}_linux_amd64.zip
           unzip terraform.zip
