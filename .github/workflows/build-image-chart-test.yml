@@ -51,11 +51,11 @@ jobs:
           ./terraform version
           ./terraform init
 
-      - name: Terraform plan
-        id: terraform-plan
+      - name: Terraform apply
+        id: terraform-apply
         shell: bash
         working-directory: ${{ env.working-directory }}
-        run: ./terraform plan -no-color
+        run: ./terraform apply -auto-approve
       
       - name: Workflow end
         run: echo "Finished with terraform actions"
