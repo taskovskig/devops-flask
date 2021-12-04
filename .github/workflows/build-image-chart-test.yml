@@ -122,9 +122,9 @@ jobs:
           chmod 700 get_helm.sh
           ./get_helm.sh
           rm -f get_helm.sh
-          sed -ie "s/GH_RUN_NUMBER/${APP_VERSION}/g" Chart.yaml
+          sed -ie "s/APP_VERSION/${APP_VERSION}/g" Chart.yaml
           sed -ie "s/IMAGE_REGISTRY/${ECR_REGISTRY}/g" values.yaml
           sed -ie "s/IMAGE_REPOSITORY/${ECR_REPOSITORY}/g" values.yaml
           sed -ie "s/IMAGE_TAG/${IMAGE_TAG}/g" values.yaml
           helm package ./
-          helm push flask-app-1.0.${APP_VERSION}.tgz oci://${ECR_REGISTRY}/
+          helm push flask-app-${APP_VERSION}.tgz oci://${ECR_REGISTRY}/
