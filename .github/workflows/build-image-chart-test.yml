@@ -52,8 +52,9 @@ jobs:
           ./terraform init
 
       - name: Terraform plan
-        shell: bash
         id: terraform-plan
+        shell: bash
+        working-directory: ${{ env.working-directory }}
         run: ./terraform plan --no-color
       
       - name: Workflow end
