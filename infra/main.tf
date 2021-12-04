@@ -4,27 +4,28 @@ terraform {
       source  = "hashicorp/aws"
       version = "~> 3.0"
     }
+    /*
     helm = {
-      version = "1.3.2"
+      version = ">= 2.0"
     }
     kubernetes = {
       version = ">= 1.11"
     }
+    */
   }
 }
 
 terraform {
   backend "s3" {
-    bucket               = "vatbox-build-info"
-    workspace_key_prefix = "terraform/tf-eks/env"
-    key                  = "terraform/tf-eks"
-    region               = "eu-west-1"
-    dynamodb_table       = "terraform-state-lock"
+    bucket         = "tf-stt"
+    key            = "devops-flask/flask-app/terraform.tfstate"
+    region         = "eu-central-1"
+    dynamodb_table = "terraform-state-lock"
   }
 }
 
 provider "aws" {
-  region = var.region
+  region = var.aws.region
 }
 
 /*
@@ -41,3 +42,12 @@ provider "helm" {
   }
 }
 */
+
+resource "aws_ecr_repository" "flask_app" {
+  name                 = var.aws.ecr.repository_name
+  image_tag_mutability = "MUTABLE"
+
+  image_scanning_configuration {
+    scan_on_push = false
+  }
+}

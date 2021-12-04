@@ -1,8 +1,19 @@
 name: Build and Test CI Workflow
-on: [pull_request]
+on:
+  push:
+    branches:
+    - dev
+    paths:
+    - 'infra/**.tf'
+    - 'infra/**.tfvars'
+    - 'infra/.terraform-version'
+    - 'flask-app/app/**.py'
+    - 'flask-app/Dockerfile'
+    - 'flask-app/requirements.txt'
+    - '**.yml'
 
 jobs:
-  build:
+  aws-ecr-setup:
     timeout-minutes: 10
     name: Create ECR repository
     runs-on: ubuntu-latest
@@ -29,7 +40,7 @@ jobs:
       - name: Set environment variable TF_VERSION
         run: echo "TF_VERSION=$(head -1 .terraform-version)" >> $GITHUB_ENV
       
-      - name: Terraforming infrastructure...
+      - name: Terraforming install and init
         run: |
           curl -qL -o terraform.zip https://releases.hashicorp.com/terraform/${TF_VERSION}/terraform_${TF_VERSION}_linux_amd64.zip
           unzip terraform.zip
@@ -37,7 +48,10 @@ jobs:
           ./terraform version
           cd infra
           ./terraform init
-          ./terraform plan
+
+      - name: Terraform plan
+        id: terraform-plan
+        run: ./terraform plan --no-color
       
       - name: Workflow end
         run: echo "Finished with terraform actions"
