@@ -5,10 +5,11 @@
 replicaCount: 1
 
 image:
-  repository: nginx
+  registry: IMAGE_REGISTRY
+  repository: IMAGE_REPOSITORY
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: ""
+  tag: IMAGE_TAG
 
 imagePullSecrets: []
 nameOverride: ""
@@ -72,7 +73,7 @@ resources: {}
 autoscaling:
   enabled: false
   minReplicas: 1
-  maxReplicas: 100
+  maxReplicas: 10
   targetCPUUtilizationPercentage: 80
   # targetMemoryUtilizationPercentage: 80
 

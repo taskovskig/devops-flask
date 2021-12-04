@@ -85,3 +85,49 @@ jobs:
         run: |
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+
+  build-helm-chart:
+    needs: build-image
+    name: Build helm chart
+    runs-on: ubuntu-latest
+    env:
+      working-directory: ./helm
+      app-name: flask-app
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.push.head.sha }}
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_DEFAULT_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Build and publish helm chart
+        working-directory: ${{ env.working-directory }}
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: flask-app
+          IMAGE_TAG: v1.0.${{ github.run_number }}
+          APP_VERSION: 1.0.${{ github.run_number }}
+          APP_NAME: ${{ env.app-name }}
+        run: |
+          export HELM_EXPERIMENTAL_OCI=1
+          curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
+          chmod 700 get_helm.sh
+          ./get_helm.sh
+          rm -f get_helm.sh
+          sed -ie "s/GH_RUN_NUMBER/${APP_VERSION}/g" ${APP_NAME}/Chart.yaml
+          sed -ie "s/IMAGE_REGISTRY/${ECR_REGISTRY}/g" ${APP_NAME}/values.yaml
+          sed -ie "s/IMAGE_REPOSITORY/${ECR_REPOSITORY}/g" ${APP_NAME}/values.yaml
+          sed -ie "s/IMAGE_TAG/${IMAGE_TAG}/g" ${APP_NAME}/values.yaml
+          helm dependency update
+          helm package ${APP_NAME}
+          helm push ${APP_NAME}-1.0.${APP_VERSION}.tgz oci://${ECR_REGISTRY}/
