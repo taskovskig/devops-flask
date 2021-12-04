@@ -1,0 +1,43 @@
+name: Build and Test CI Workflow
+on: [pull_request]
+
+jobs:
+  build:
+    timeout-minutes: 10
+    name: Create ECR repository
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      
+      - name: Set environment variable AWS_DEFAULT_REGION
+        env:
+          AR: ${{ secrets.AWS_DEFAULT_REGION }}
+        run: echo "AWS_DEFAULT_REGION=${AR}" >> $GITHUB_ENV
+      
+      - name: Set environment variable AWS_ACCESS_KEY_ID
+        env:
+          AAKI: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        run: echo "AWS_ACCESS_KEY_ID=${AAKI}" >> $GITHUB_ENV
+      
+      - name: Set environment variable AWS_SECRET_ACCESS_KEY
+        env:
+          ASAK: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        run: echo "AWS_SECRET_ACCESS_KEY=${ASAK}" >> $GITHUB_ENV
+      
+      - name: Set environment variable TF_VERSION
+        run: echo "TF_VERSION=$(head -1 .terraform-version)" >> $GITHUB_ENV
+      
+      - name: Terraforming infrastructure...
+        run: |
+          curl -qL -o terraform.zip https://releases.hashicorp.com/terraform/${TF_VERSION}/terraform_${TF_VERSION}_linux_amd64.zip
+          unzip terraform.zip
+          chmod +x ./terraform
+          ./terraform version
+          cd infra
+          ./terraform init
+          ./terraform plan
+      
+      - name: Workflow end
+        run: echo "Finished with terraform actions"
