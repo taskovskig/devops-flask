@@ -38,7 +38,7 @@ jobs:
         run: echo "AWS_SECRET_ACCESS_KEY=${ASAK}" >> $GITHUB_ENV
       
       - name: Set environment variable TF_VERSION
-        run: echo "TF_VERSION=$(head -1 .terraform-version)" >> $GITHUB_ENV
+        run: echo "TF_VERSION=$(head -1 infra/.terraform-version)" >> $GITHUB_ENV
       
       - name: Terraforming install and init
         run: |
