@@ -11,6 +11,7 @@ on:
     - 'flask-app/Dockerfile'
     - 'flask-app/requirements.txt'
     - '**.yml'
+    - '**.yaml'
 
 jobs:
 
