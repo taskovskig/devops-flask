@@ -127,6 +127,7 @@ jobs:
           sed -ie "s/IMAGE_REPOSITORY/${ECR_REPOSITORY}/g" values.yaml
           sed -ie "s/IMAGE_TAG/${IMAGE_TAG}/g" values.yaml
           helm package ./
+          helm s3 cp ${ECR_REPOSITORY}-${APP_VERSION}.tgz s3://sferatech-helm-repo/${ECR_REPOSITORY}-${APP_VERSION}.tgz
           aws ecr get-login-password --region ${{ secrets.AWS_DEFAULT_REGION }} | helm registry login --username AWS --password-stdin ${ECR_REGISTRY}
           helm push flask-app-${APP_VERSION}.tgz oci://${ECR_REGISTRY}/
 
@@ -168,4 +169,5 @@ jobs:
           ./get_helm.sh
           aws ecr get-login-password --region ${{ secrets.AWS_DEFAULT_REGION }} | helm registry login --username AWS --password-stdin ${ECR_REGISTRY}
           helm pull oci://${ECR_REGISTRY}/${ECR_REPOSITORY} --version ${APP_VERSION}
+          tar xzvf ${ECR_REPOSITORY}-${APP_VERSION}.tgz --warning=no-timestamp
           helm install flask-app-test ./${ECR_REPOSITORY} --dry-run
