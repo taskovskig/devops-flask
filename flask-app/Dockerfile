@@ -7,4 +7,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY app/hello.py ./
 
-CMD [ "export", "FLASK_APP=hello.py", "&&", "flask", "run", "--host=0.0.0.0" ]
+ENV FLASK_APP=hello.py
+
+EXPOSE 5000
+
+CMD [ "flask", "run", "--host=0.0.0.0" ]
