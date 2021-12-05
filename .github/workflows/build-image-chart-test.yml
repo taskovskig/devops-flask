@@ -89,7 +89,7 @@ jobs:
 
   package-helm-chart:
     needs: build-image
-    name: Build helm chart
+    name: Package helm chart
     runs-on: ubuntu-latest
     env:
       working-directory: ./helm/flask-app
