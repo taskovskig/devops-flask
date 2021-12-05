@@ -87,7 +87,7 @@ jobs:
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
 
-  build-helm-chart:
+  package-helm-chart:
     needs: build-image
     name: Build helm chart
     runs-on: ubuntu-latest
@@ -134,7 +134,7 @@ jobs:
           aws s3 cp ${ECR_REPOSITORY}.txt s3://sferatech-helm-repo/${ECR_REPOSITORY}.txt
 
   test-helm-chart:
-    needs: build-helm-chart
+    needs: package-helm-chart
     name: Test helm chart
     runs-on: ubuntu-latest
 
