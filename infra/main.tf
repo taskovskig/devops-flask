@@ -26,9 +26,9 @@ provider "aws" {
 }
 
 provider "helm" {
-  # kubernetes {
-  #   config_path = module.eks.kubeconfig_filename
-  # }
+  kubernetes {
+    config_path = "/tmp/output/kubeconfig-v1.21.2-k3s1.yaml"
+  }
 }
 
 resource "aws_ecr_repository" "flask_app" {
