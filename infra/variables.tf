@@ -12,5 +12,5 @@ variable "helm_release_status" {
 variable "helm_release_name" {
   description = "Whether to install the helm release"
   type        = string
-  default     = "flask_app"
+  default     = "flask-app"
 }

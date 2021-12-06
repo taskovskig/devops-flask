@@ -59,4 +59,4 @@ jobs:
           chmod +x ./terraform
           ./terraform version
           ./terraform init
-          ./terraform apply -auto-approve -input=false -var="helm_release_status=true" -var="helm_release_name=${ECR_REPOSITORY}"
+          ./terraform apply -auto-approve -input=false -var="helm_release_status=true"
