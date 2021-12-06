@@ -2,7 +2,7 @@ name: Build and Test CI Workflow
 on:
   push:
     branches:
-    - dev
+    - junk
     paths:
     - 'infra/**.tf'
     - 'infra/**.tfvars'
