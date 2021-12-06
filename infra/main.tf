@@ -45,4 +45,5 @@ resource "helm_release" "flask_app" {
 
   name  = var.helm_release_name
   chart = format("./%s", var.helm_release_name)
+  wait  = false
 }
