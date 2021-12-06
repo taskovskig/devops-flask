@@ -90,12 +90,26 @@ sudo cp ${HOME}/etc_hosts /etc/hosts
 aws secretsmanager get-secret-value --secret-id eks/keyName/github-eks | jq -r .SecretString > $HOME/.ssh/id_rsa_github_eks
 chmod 600 $HOME/.ssh/id_rsa_github_eks
 ```
+### Get the public IP of the GitHub runner
+```
+    steps:
+    - name: Public IP
+      id: ip
+      uses: haythem/public-ip@v1.2
+
+    - name: Print Public IP
+      run: |
+        echo ${{ steps.ip.outputs.ipv4 }}
+        echo ${{ steps.ip.outputs.ipv6 }}
+```
 ### Set access to k8s control plane
 ```
-aws ec2 authorize-security-group-ingress --region ${AWS_DEFAULT_REGION} --group-id ${EKS_BASTION_SECURITY_GROUP_ID} --ip-permissions  "[{\"IpProtocol\": \"tcp\", \"FromPort\": 22, \"ToPort\": 22, \"IpRanges\": [{\"CidrIp\": \"${public_ip_address}/32\", \"Description\": \"Temporary ingress for GitHub runner deploying to cluster\"}]}]" || true
+aws ec2 authorize-security-group-ingress --region ${AWS_DEFAULT_REGION} --group-id ${EKS_BASTION_SECURITY_GROUP_ID} --ip-permissions  "[{\"IpProtocol\": \"tcp\", \"FromPort\": 22, \"ToPort\": 22, \"IpRanges\": [{\"CidrIp\": \"${{ steps.ip.outputs.ipv4 }}/32\", \"Description\": \"Temporary ingress for GitHub runner deploying to cluster\"}]}]" || true
 ```
 ### Get kubeconfig for EKS cluster
 ```
-aws eks update-kubeconfig --name stag-cluster-1 --kubeconfig $HOME/.kube/k8s-circleci-eks-staging-config.conf
-sed -ie "s/${K8S_EKS_STAGING_CLUSTER_API_ENDPOINT}/kubernetes.default.svc.cluster.local:8443/g;" $HOME/.kube/k8s-circleci-eks-staging-config.conf
+aws eks update-kubeconfig --name eks-cluster --kubeconfig $HOME/.kube/k8s-github-eks-cluster.conf
+sed -ie "s/${K8S_EKS_CLUSTER_API_ENDPOINT}/kubernetes.default.svc.cluster.local:8443/g;" $HOME/.kube/k8s-github-eks-cluster.conf
 ```
+### Establish SSH tunnel via bastion host
+ssh -4 -N -f -L 8443:${K8S_EKS_CLUSTER_API_ENDPOINT}:443 ubuntu@${EKS_STAGING_BASTION_IP} -i $HOME/.ssh/id_rsa_github_eks -o StrictHostKeyChecking=no
