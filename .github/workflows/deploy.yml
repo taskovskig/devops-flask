@@ -45,11 +45,12 @@ jobs:
           export HELM_CHART_VERSION=`head -1 ${ECR_REPOSITORY}.txt`
           helm pull oci://${ECR_REGISTRY}/${ECR_REPOSITORY} --version ${HELM_CHART_VERSION}
 
-          # Deploy helm release via command line
+          ### Deploy helm release via command line
           tar xzvf ${ECR_REPOSITORY}-${HELM_CHART_VERSION}.tgz --warning=no-timestamp
           helm upgrade -i flask-app ./${ECR_REPOSITORY}
 
-          # Deploy helm release via terraform
+          ### Deploy helm release via terraform
+          ### Make sure to uncomment helm provider kubernetes config_path in infra/main.tf
           # mv ${ECR_REPOSITORY}-${HELM_CHART_VERSION}.tgz infra/
           # cd infra
           # tar xzvf ${ECR_REPOSITORY}-${HELM_CHART_VERSION}.tgz --warning=no-timestamp
