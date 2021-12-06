@@ -112,4 +112,6 @@ aws eks update-kubeconfig --name eks-cluster --kubeconfig $HOME/.kube/k8s-github
 sed -ie "s/${K8S_EKS_CLUSTER_API_ENDPOINT}/kubernetes.default.svc.cluster.local:8443/g;" $HOME/.kube/k8s-github-eks-cluster.conf
 ```
 ### Establish SSH tunnel via bastion host
+```
 ssh -4 -N -f -L 8443:${K8S_EKS_CLUSTER_API_ENDPOINT}:443 ubuntu@${EKS_STAGING_BASTION_IP} -i $HOME/.ssh/id_rsa_github_eks -o StrictHostKeyChecking=no
+```
