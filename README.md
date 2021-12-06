@@ -102,7 +102,7 @@ chmod 600 $HOME/.ssh/id_rsa_github_eks
         echo ${{ steps.ip.outputs.ipv4 }}
         echo ${{ steps.ip.outputs.ipv6 }}
 ```
-### Set access to k8s control plane
+### Set access to EKS cluster
 ```
 aws ec2 authorize-security-group-ingress --region ${AWS_DEFAULT_REGION} --group-id ${EKS_BASTION_SECURITY_GROUP_ID} --ip-permissions  "[{\"IpProtocol\": \"tcp\", \"FromPort\": 22, \"ToPort\": 22, \"IpRanges\": [{\"CidrIp\": \"${{ steps.ip.outputs.ipv4 }}/32\", \"Description\": \"Temporary ingress for GitHub runner deploying to cluster\"}]}]" || true
 ```
@@ -114,4 +114,8 @@ sed -ie "s/${K8S_EKS_CLUSTER_API_ENDPOINT}/kubernetes.default.svc.cluster.local:
 ### Establish SSH tunnel via bastion host
 ```
 ssh -4 -N -f -L 8443:${K8S_EKS_CLUSTER_API_ENDPOINT}:443 ubuntu@${EKS_STAGING_BASTION_IP} -i $HOME/.ssh/id_rsa_github_eks -o StrictHostKeyChecking=no
+```
+## Revoke SSH access to EKS cluster
+```
+aws ec2 revoke-security-group-ingress --region ${AWS_DEFAULT_REGION} --group-id ${EKS_BASTION_SECURITY_GROUP_ID} --protocol tcp --port 22 --cidr "${{ steps.ip.outputs.ipv4 }}/32"
 ```
