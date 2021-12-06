@@ -44,5 +44,5 @@ resource "helm_release" "flask_app" {
   count = var.helm_release_status ? 1 : 0
 
   name  = "flask_app"
-  chart = format("./charts/%s", var.helm_release_name)
+  chart = format("./%s", var.helm_release_name)
 }
