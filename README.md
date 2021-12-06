@@ -1,4 +1,4 @@
-# devops-flask (CI/CD showcase)
+# devops-flask: A CI/CD showcase for deploying helm release to AWS EKS cluster with GitHub Actions and Terraform
 ## develop (dev branch)
 - Create ECR repository using terraform
 - Build image
@@ -93,4 +93,9 @@ chmod 600 $HOME/.ssh/id_rsa_github_eks
 ### Set access to k8s control plane
 ```
 aws ec2 authorize-security-group-ingress --region ${AWS_DEFAULT_REGION} --group-id ${EKS_BASTION_SECURITY_GROUP_ID} --ip-permissions  "[{\"IpProtocol\": \"tcp\", \"FromPort\": 22, \"ToPort\": 22, \"IpRanges\": [{\"CidrIp\": \"${public_ip_address}/32\", \"Description\": \"Temporary ingress for GitHub runner deploying to cluster\"}]}]" || true
+```
+### Get kubeconfig for EKS cluster
+```
+aws eks update-kubeconfig --name stag-cluster-1 --kubeconfig $HOME/.kube/k8s-circleci-eks-staging-config.conf
+sed -ie "s/${K8S_EKS_STAGING_CLUSTER_API_ENDPOINT}/kubernetes.default.svc.cluster.local:8443/g;" $HOME/.kube/k8s-circleci-eks-staging-config.conf
 ```
