@@ -25,13 +25,11 @@ provider "aws" {
   region = var.aws.region
 }
 
-/*
 provider "helm" {
   kubernetes {
     config_path = module.eks.kubeconfig_filename
   }
 }
-*/
 
 resource "aws_ecr_repository" "flask_app" {
   name                 = var.aws.ecr.repository_name
@@ -40,4 +38,11 @@ resource "aws_ecr_repository" "flask_app" {
   image_scanning_configuration {
     scan_on_push = false
   }
+}
+
+resource "helm_release" "flask_app" {
+  count = var.helm_release_status ? 1 : 0
+
+  name  = "flask_app"
+  chart = format("./charts/%s", var.helm_release_name)
 }

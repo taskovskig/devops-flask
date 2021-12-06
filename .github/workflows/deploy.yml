@@ -9,6 +9,8 @@ jobs:
   deploy-helm-release:
     name: Deploy helm release
     runs-on: ubuntu-latest
+    env:
+      working-directory: ./infra
 
     steps:
       - uses: actions/checkout@v2
@@ -32,6 +34,7 @@ jobs:
           version: 'v1.21.2-k3s1'
 
       - name: Deploy helm release
+        working-directory: ${{ env.working-directory }}
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: flask-app
@@ -44,5 +47,19 @@ jobs:
           aws s3 cp s3://sferatech-helm-repo/${ECR_REPOSITORY}.txt ${ECR_REPOSITORY}.txt
           export HELM_CHART_VERSION=`head -1 ${ECR_REPOSITORY}.txt`
           helm pull oci://${ECR_REGISTRY}/${ECR_REPOSITORY} --version ${HELM_CHART_VERSION}
-          tar xzvf ${ECR_REPOSITORY}-${HELM_CHART_VERSION}.tgz --warning=no-timestamp
-          helm upgrade -i flask-app ./${ECR_REPOSITORY}
+
+          # Deploy helm release via command line
+          # tar xzvf ${ECR_REPOSITORY}-${HELM_CHART_VERSION}.tgz --warning=no-timestamp
+          # helm upgrade -i flask-app ./${ECR_REPOSITORY}
+
+          # Deploy helm release via terraform
+          mv ${ECR_REPOSITORY}-${HELM_CHART_VERSION}.tgz charts/
+          tar xzvf charts/${ECR_REPOSITORY}-${HELM_CHART_VERSION}.tgz --warning=no-timestamp
+          cd infra
+          export TF_VERSION=$(head -1 .terraform-version)
+          curl -qL -o terraform.zip https://releases.hashicorp.com/terraform/${TF_VERSION}/terraform_${TF_VERSION}_linux_amd64.zip
+          unzip terraform.zip
+          chmod +x ./terraform
+          ./terraform version
+          ./terraform init
+          ./terraform apply -auto-approve -input=false -var="helm_release_status=true" -var="helm_release_name=${ECR_REPOSITORY}"
