@@ -53,9 +53,7 @@ jobs:
           # helm upgrade -i flask-app ./${ECR_REPOSITORY}
 
           # Deploy helm release via terraform
-          mv ${ECR_REPOSITORY}-${HELM_CHART_VERSION}.tgz charts/
-          tar xzvf charts/${ECR_REPOSITORY}-${HELM_CHART_VERSION}.tgz --warning=no-timestamp
-          cd infra
+          tar xzvf ${ECR_REPOSITORY}-${HELM_CHART_VERSION}.tgz --warning=no-timestamp
           export TF_VERSION=$(head -1 .terraform-version)
           curl -qL -o terraform.zip https://releases.hashicorp.com/terraform/${TF_VERSION}/terraform_${TF_VERSION}_linux_amd64.zip
           unzip terraform.zip
