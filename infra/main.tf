@@ -26,9 +26,9 @@ provider "aws" {
 }
 
 provider "helm" {
-  kubernetes {
-    config_path = module.eks.kubeconfig_filename
-  }
+  # kubernetes {
+  #   config_path = module.eks.kubeconfig_filename
+  # }
 }
 
 resource "aws_ecr_repository" "flask_app" {
